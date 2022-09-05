@@ -14,9 +14,11 @@ import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class UserServiceImplTest {
@@ -25,6 +27,8 @@ class UserServiceImplTest {
     public static final String  NAME = "Gustavo";
     public static final String  EMAIL = "gustavo@mail.com";
     public static final String  PASSWORD = "123";
+    public static final int INDEX = 0;
+    public static final String OBJETO_NAO_ENCONTRADO = "Objeto não encontrado";
     @InjectMocks //Cria uma instancia real da classe, para injetar os mocks
     private UserServiceImpl service;
 
@@ -47,28 +51,39 @@ class UserServiceImplTest {
     @Test
     void whenFindByIdThenReturnAnUserInstance() {
         //está mockando um inteiro qualquer e retornando um optionalUser, quando o repository for chamado
-        Mockito.when(repository.findById(Mockito.anyInt())).thenReturn(optionalUser);
+        when(repository.findById(Mockito.anyInt())).thenReturn(optionalUser);
 
         User response = service.findById(ID);
-        Assertions.assertNotNull(response);
-        Assertions.assertEquals(User.class, response.getClass());
-        Assertions.assertEquals(ID, response.getId());
-        Assertions.assertEquals(NAME, response.getName());
-        Assertions.assertEquals(EMAIL, response.getEmail());
+        assertNotNull(response);
+        assertEquals(User.class, response.getClass());
+        assertEquals(ID, response.getId());
+        assertEquals(NAME, response.getName());
+        assertEquals(EMAIL, response.getEmail());
     }
 
     @Test
     void whenFindByIdThenReturnAnObjectNotFoundException(){
-        Mockito.when(repository.findById(Mockito.anyInt())).thenThrow(new ObjectNotFoundException(("Objeto não encontrado")));
+        when(repository.findById(Mockito.anyInt())).thenThrow(new ObjectNotFoundException(OBJETO_NAO_ENCONTRADO));
         try{
             service.findById(ID);
         } catch (Exception ex) {
             assertEquals(ObjectNotFoundException.class, ex.getClass());
-            assertEquals("Objeto não encontrado", ex.getMessage());
+            assertEquals(OBJETO_NAO_ENCONTRADO, ex.getMessage());
         }
     }
     @Test
-    void findAll() {
+    void whenFindAllThenReturnAnListOfUsers() {
+        when(repository.findAll()).thenReturn(List.of(user));
+        List<User> response = service.findAll();
+        assertNotNull(response);
+        assertEquals(1, response.size());
+        assertEquals(User.class, response.get(INDEX).getClass());
+
+        assertEquals(ID, response.get(INDEX).getId());
+        assertEquals(NAME, response.get(INDEX).getName());
+        assertEquals(EMAIL, response.get(INDEX).getEmail());
+        assertEquals(PASSWORD, response.get(INDEX).getPassword());
+
     }
 
     @Test
