@@ -19,9 +19,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class UserServiceImplTest {
@@ -54,7 +53,7 @@ class UserServiceImplTest {
     @Test
     void whenFindByIdThenReturnAnUserInstance() {
         //está mockando um inteiro qualquer e retornando um optionalUser, quando o repository for chamado
-        when(repository.findById(Mockito.anyInt())).thenReturn(optionalUser);
+        when(repository.findById(anyInt())).thenReturn(optionalUser);
 
         User response = service.findById(ID);
         assertNotNull(response);
@@ -66,7 +65,7 @@ class UserServiceImplTest {
 
     @Test
     void whenFindByIdThenReturnAnObjectNotFoundException(){
-        when(repository.findById(Mockito.anyInt())).thenThrow(new ObjectNotFoundException(OBJETO_NAO_ENCONTRADO));
+        when(repository.findById(anyInt())).thenThrow(new ObjectNotFoundException(OBJETO_NAO_ENCONTRADO));
         try{
             service.findById(ID);
         } catch (Exception ex) {
@@ -118,7 +117,7 @@ class UserServiceImplTest {
     @Test
     void whenUpdateThenReturnSuccess() {
         when(repository.save(any())).thenReturn(user);
-        when(repository.findById(Mockito.anyInt())).thenReturn(optionalUser);
+        when(repository.findById(anyInt())).thenReturn(optionalUser);
 
         User response = service.update(userDto);
 
@@ -132,7 +131,7 @@ class UserServiceImplTest {
 
     @Test
     void whenUpdateThenReturnAnDataIntegrityViolationException() {
-        when(repository.findById(Mockito.anyInt())).thenReturn(optionalUser);
+        when(repository.findById(anyInt())).thenReturn(optionalUser);
         when(repository.findByEmail(anyString())).thenReturn(optionalUser);
 
         try {
@@ -145,7 +144,11 @@ class UserServiceImplTest {
     }
 
     @Test
-    void delete() {
+    void deleteWhithSuccess() {
+        when(repository.findById(anyInt())).thenReturn(optionalUser);
+        doNothing().when(repository).deleteById(anyInt());
+        service.delete(ID);
+        verify(repository, times(1)).deleteById(anyInt());
     }
 
     private void startUser() {
