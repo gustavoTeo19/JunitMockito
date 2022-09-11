@@ -8,8 +8,6 @@ import javax.persistence.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
-@ToString
 @Entity(name="TB_USER")
 public class User {
     @Id
